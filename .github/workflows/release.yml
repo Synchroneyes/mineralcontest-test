@@ -49,7 +49,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.TOKEN_GITHUB }}
 
       - name: Fetch Commit Messages
-        id: fetch_commit_messages
+        id: fetch_commit_messages 
         run: |
           RELEASE_NOTES=$(curl -s -H "Authorization: token ${{ secrets.TOKEN_GITHUB }}" \
             -H "Accept: application/vnd.github.v3+json" \
