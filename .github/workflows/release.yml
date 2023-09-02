@@ -43,14 +43,22 @@ jobs:
         id: create_release
         uses: softprops/action-gh-release@v1
         with:
-          files: target/* # Adjust this path to match your build artifacts
+          files: target/MineralContest.jar # Adjust this path to match your build artifacts
           tag_name: ${{ steps.extract_version.outputs.version }}
         env:
           GITHUB_TOKEN: ${{ secrets.TOKEN_GITHUB }}
 
+      - name: Fetch Commit Messages
+        id: fetch_commit_messages
+        run: |
+          RELEASE_NOTES=$(curl -s -H "Authorization: token ${{ secrets.TOKEN_GITHUB }}" \
+            -H "Accept: application/vnd.github.v3+json" \
+            "https://api.github.com/repos/${{ github.repository }}/commits/${{ github.sha }}/comments" \
+            | jq -r '.[].body' | sed 's/^/- /')
+          echo "$RELEASE_NOTES" > release_notes.txt
+
       - name: Set Release Description
         run: |
-          git log --format="- %s" ${{ github.event.pull_request.base.sha }}..${{ github.sha }} > release_notes.txt
           gh release edit ${{ steps.create_release.outputs.upload_url }} --notes release_notes.txt
         env:
           GH_TOKEN: ${{ secrets.TOKEN_GITHUB }}
