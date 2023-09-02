@@ -43,7 +43,7 @@ jobs:
         id: create_release
         uses: softprops/action-gh-release@v1
         with:
-          files: target/* # Adjust this path to match your build artifacts
+          files: target/MineralContest.jar # Adjust this path to match your build artifacts
           tag_name: ${{ steps.extract_version.outputs.version }}
         env:
           GITHUB_TOKEN: ${{ secrets.TOKEN_GITHUB }}
