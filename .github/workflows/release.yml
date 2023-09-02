@@ -40,6 +40,7 @@ jobs:
         run: mvn clean install
 
       - name: Get past commits
+        id: past_commits
         run: |
           RELEASE_NOTES=$(curl -s -H "Authorization: token ${{ secrets.TOKEN_GITHUB }}" \
               -H "Accept: application/vnd.github.v3+json" \
@@ -55,7 +56,7 @@ jobs:
         with:
           files: target/MineralContest.jar # Adjust this path to match your build artifacts
           tag_name: ${{ steps.extract_version.outputs.version }}
-          body:
+          body: ${{steps.past_commits.outputs.RELEASE_NOTES}}
         env:
           GITHUB_TOKEN: ${{ secrets.TOKEN_GITHUB }}
 
