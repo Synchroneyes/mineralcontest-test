@@ -59,6 +59,10 @@ jobs:
 
       - name: Set Release Description
         run: |
-          gh release edit ${{ steps.extract_version.outputs.version }} --notes release_notes.txt
+          RELEASE_NOTES=$(curl -s -H "Authorization: token ${{ secrets.TOKEN_GITHUB }}" \
+              -H "Accept: application/vnd.github.v3+json" \
+              "https://api.github.com/repos/${{ github.repository }}/commits/${{ github.sha }}/comments" \
+              | jq -r '.[].body' | sed 's/^/- /')
+          gh release edit ${{ steps.extract_version.outputs.version }} --notes $RELEASE_NOTES
         env:
           GH_TOKEN: ${{ secrets.TOKEN_GITHUB }}
