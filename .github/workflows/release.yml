@@ -1,0 +1,48 @@
+name: Release Workflow
+
+on:
+  pull_request:
+    types:
+      - closed
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check if PR is merged to main
+        id: pr_merged
+        run: echo "::set-output name=is_merged::${{ github.event.pull_request.merged }}"
+
+      - name: Only run on merged PR to main
+        run: |
+          if [[ "${{ steps.pr_merged.outputs.is_merged }}" != "true" ]]; then
+            echo "Not a merged PR to main. Exiting..."
+            exit 0
+          fi
+
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Java (if needed)
+        uses: actions/setup-java@v2
+        with:
+          java-version: '18' # You can change this to your desired Java version
+
+      - name: Build with Maven
+        run: mvn clean install
+
+      - name: Create Release and Attach Build
+        id: create_release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: target/* # Adjust this path to match your build artifacts
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set Release Description
+        run: |
+          git log --format="- %s" ${{ github.event.pull_request.head.sha }}..${{ github.sha }} > release_notes.txt
+          gh release edit ${{ steps.create_release.outputs.upload_url }} --notes release_notes.txt
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
