@@ -50,7 +50,7 @@ jobs:
 
       - name: Set Release Description
         run: |
-          git log --format="- %s" ${{ github.event.pull_request.head.sha }}..${{ github.sha }} > release_notes.txt
+          git log --format="- %s" ${{ github.event.pull_request.base.sha }}..${{ github.sha }} > release_notes.txt
           gh release edit ${{ steps.create_release.outputs.upload_url }} --notes release_notes.txt
         env:
           GH_TOKEN: ${{ secrets.TOKEN_GITHUB }}
