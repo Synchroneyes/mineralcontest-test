@@ -33,7 +33,7 @@ jobs:
       - name: Extract Version from pom.xml
         id: extract_version
         run: |
-          VERSION=$(xmllint --xpath "string(/project/version)" pom.xml)
+          VERSION=$(grep -oPm1 "(?<=<version>)[^<]+" pom.xml)
           echo "::set-output name=version::$VERSION"
 
       - name: Build with Maven
